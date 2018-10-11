@@ -37,12 +37,13 @@ SELECT t."id" AS "t_id",
        t."signatures" AS "t_signatures",
        (SELECT height + 1 FROM blocks ORDER BY height DESC LIMIT 1) - b."height" AS "confirmations",
        t."rowId" AS "t_rowId",
-       (SELECT convert_from(data,'UTF8') as "data" FROM transfer WHERE transfer."transactionId"=t."id") AS "data"
+       convert_from(tf."data",'UTF8') AS "tf_data"
 
 FROM trs t
 
 LEFT JOIN blocks b ON t."blockId" = b."id"
-LEFT JOIN mem_accounts m ON t."recipientId" = m."address";
+LEFT JOIN mem_accounts m ON t."recipientId" = m."address"
+LEFT JOIN transfer tf ON tf."transactionId" = t."id";
 
 CREATE INDEX IF NOT EXISTS "trs_upper_sender_id" ON "trs"(UPPER("senderId"));
 CREATE INDEX IF NOT EXISTS "trs_upper_recipient_id" ON "trs"(UPPER("recipientId"));
